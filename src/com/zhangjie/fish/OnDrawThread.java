@@ -1,0 +1,54 @@
+package com.zhangjie.fish;
+
+import android.graphics.Canvas;
+import android.util.Log;
+import android.view.SurfaceHolder;
+
+public class OnDrawThread extends Thread{
+	private SurfaceHolder myHolder = null;
+	private MySurfaceView myView = null;
+	private static final long SLEEP_TIME = 30;
+	
+	
+	public OnDrawThread(MySurfaceView surfaceView) {
+		this.myView =  surfaceView;
+		this.myHolder = surfaceView.getHolder();
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		super.run();
+		
+		Canvas canvas = null;
+		/* 循环 */
+		while (GamingInfo.getGamingInfo().isGaming()) {
+			try {
+				/* 锁定画布  */
+				canvas = myHolder.lockCanvas();
+				if (null == canvas) {
+					Log.d("onDrawThread--", "canvas is null");
+				}
+				/* 画图 */
+				myView.onDraw(canvas);
+			} catch (Exception e) {
+				// TODO: handle exception
+				Log.e("onDrawThread--", "");
+			}finally {
+				/* 解锁画布，可以修改 */
+				if (null != canvas) {
+					myHolder.unlockCanvasAndPost(canvas);
+				}
+			}
+
+			/* 控制绘图的速度 */
+			try {
+				Thread.sleep(SLEEP_TIME);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(this.getName(), e.toString());
+			}
+		}
+	}
+}
