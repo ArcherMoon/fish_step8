@@ -49,6 +49,10 @@ public class PicProperty {
 	
 	/* 设置图片 */
 	public void setCurPic(AssetManager assets, String path) throws IOException {
+		/* 手工回收不用的图片资源 */
+		if (null != bitmap && !bitmap.isRecycled()) {
+			bitmap.recycle();
+		}
 		/* 从AssetManager读入流  */
 		InputStream is = assets.open(path);
 		

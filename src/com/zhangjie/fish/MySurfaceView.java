@@ -60,10 +60,17 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public Fish bulletTmp = null;
 	public Bitmap globalBitmap = null;
 	
+	private Global global = null;
+	private PicProperty bg = null;
+	public int scene = 0;
+	
 	public MySurfaceView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 		Log.d("MySurfaceView--->", "chenggong");
+		
+		/* 获取全局变量 */
+		global = Global.getInstance();
 		/* 从assets文件夹获取图片资源等  */
 		assets = context.getAssets();
 		
@@ -99,6 +106,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		ArrayList<PicProperty> topPicList = new ArrayList<PicProperty>();
 		picLayer.put(TOP_LAYER, topPicList);
 		
+		bg = new PicProperty();
+		
 		/* 将大图按照xml文件解析成多张小图坐标，尺寸存储在hash表 */
 		try {
 			actPicsMap.put("fish", PicParser.parser(assets, "images/fish/fish.xml"));
@@ -109,55 +118,18 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-	
-		/* 加背景到背景层 */
-		PicProperty bg = null;
-		try {
-			bg = new PicProperty();
-			bg.setCurPic(assets, "images/bg/fishlightbg_0.jpg");
-			updatePicLayer(CHANGE_MODE_ADD, BOTTOM_LAYER, bg);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			Log.d("set bg", "");
-			e1.printStackTrace();
-		}
-		
-		/* 加一条鱼到中间层 */
-		Fish fish = null;
-		fish = new Fish(DEVICE_WIDTH, 160, 0 ,0, 50);
-		
-		/* 加第2条鱼到中间层 */
-		Fish fish2 = null;
-//		fish2 = new Fish(DEVICE_WIDTH, 100, 0 ,0, 50);
-		fish2 = new Fish(50);
+			
 		try {
 			globalBitmap = BitmapFactory.decodeStream(assets.open("images/fish/fish.png"));
-			fish.setActPics(actPicsMap.get("fish"), globalBitmap, "fish01");
-			updatePicLayer(CHANGE_MODE_ADD, MIDDLE_LAYER, fish);
-			fish2.setActPics(actPicsMap.get("fish"), globalBitmap, "fish02");
-			updatePicLayer(CHANGE_MODE_ADD, MIDDLE_LAYER, fish2);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.d("set fish", "");
 			e.printStackTrace();
 		}
-
+		
+		loadScene("images/bg/fishlightbg_" + scene + ".jpg");
+		
 		/* 启动绘图线程 */
 		myDrawThread.start();
-		
-		/* 鱼运动的线程 */
-		FishRunThread fishRunThread = new FishRunThread(fish, MOVE_CURVE, bulletTmp, this);
-		fishRunThread.start();
-		
-		FishRunThread fishRunThread2 = new FishRunThread(fish2, MOVE_STRAIGHT, bulletTmp, this);
-		fishRunThread2.start();
-		
-		/* 鱼改变自身动作的线程 */
-		FishActThread fishActThread = new FishActThread(fish);
-		fishActThread.start();
-		
-		FishActThread fishActThread2 = new FishActThread(fish2);
-		fishActThread2.start();
 	}
 
 	@Override
@@ -274,4 +246,65 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		return true;
 	}
 
+	/**
+	 * 装载背景
+	 */
+	public void loadBG(String string) {
+		/* 加背景到背景层 */
+		try {
+			bg.setCurPic(assets, string);
+			updatePicLayer(CHANGE_MODE_ADD, BOTTOM_LAYER, bg);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			Log.d("set bg", "");
+			e1.printStackTrace();
+		}
+		return;
+	}
+	
+	/**
+	 * 装载场景
+	 */
+	public void loadScene(String string) {
+		/* 初始化场景的条件 */
+		global.setHitCount(0);
+		global.setEscapeCount(0);
+		global.setYouLose(false);
+		global.setYouWin(false);
+		
+		loadBG(string);
+	
+		/* 加一条鱼到中间层 */
+		Fish fish = null;
+		fish = new Fish(DEVICE_WIDTH, 160, 0 ,0, 50);
+		
+		/* 加第2条鱼到中间层 */
+		Fish fish2 = null;
+		fish2 = new Fish(50);
+		try {
+			fish.setActPics(actPicsMap.get("fish"), globalBitmap, "fish01");
+			updatePicLayer(CHANGE_MODE_ADD, MIDDLE_LAYER, fish);
+			fish2.setActPics(actPicsMap.get("fish"), globalBitmap, "fish02");
+			updatePicLayer(CHANGE_MODE_ADD, MIDDLE_LAYER, fish2);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			Log.d("set fish", "");
+			e.printStackTrace();
+		}
+	
+		/* 鱼运动的线程 */
+		FishRunThread fishRunThread = new FishRunThread(fish, MOVE_CURVE, bulletTmp, this);
+		fishRunThread.start();
+		
+		FishRunThread fishRunThread2 = new FishRunThread(fish2, MOVE_STRAIGHT, bulletTmp, this);
+		fishRunThread2.start();
+		
+		/* 鱼改变自身动作的线程 */
+		FishActThread fishActThread = new FishActThread(fish);
+		fishActThread.start();
+		
+		FishActThread fishActThread2 = new FishActThread(fish2);
+		fishActThread2.start();
+		return;		
+	}
 }

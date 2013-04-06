@@ -1,6 +1,5 @@
 package com.zhangjie.fish;
 
-import android.R.xml;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,7 +23,6 @@ public class OnDrawThread extends Thread{
 		// TODO Auto-generated method stub
 		super.run();
 		
-		String string = null;
 		Canvas canvas = null;
 		/* 设置画笔 */
 		Paint paint = new Paint();
@@ -49,17 +47,13 @@ public class OnDrawThread extends Thread{
 				myView.onDraw(canvas);
 				/* 绘制文本 */
 				if (global.isYouWin()) {
-//					global.setHitCount(0);
-//					global.setEscapeCount(0);
-//					global.setYouWin(false);
 					canvas.drawText("你赢了!", global.getDeviceWidth() / 2, global.getDeviceHeight() / 2, paint);
-					
+					++myView.scene;
+					myView.loadScene("images/bg/fishlightbg_" + myView.scene + ".jpg");
 				}
 				else if (global.isYouLose()) {
-//					global.setHitCount(0);
-//					global.setEscapeCount(0);
-//					global.setYouLose(false);
 					canvas.drawText("你输了!", global.getDeviceWidth() / 2, global.getDeviceHeight() / 2, paint);
+					myView.loadScene("images/bg/fishlightbg_" + myView.scene + ".jpg");
 				}
 				else {
 					canvas.drawText("胜利条件：击中" + global.getTaskHitCount() + 
@@ -68,28 +62,6 @@ public class OnDrawThread extends Thread{
 									"\n已逃出：" + global.getEscapeCount(), 
 									10, 22, paint);
 				}
-				
-//				if (global.isYouWin() || global.isYouLose()) {
-//					global.setHitCount(0);
-//					global.setEscapeCount(0);
-//					if (global.isYouWin()) {
-//						string = "你赢了！";		
-//					} 
-//					else if (global.isYouLose()) {
-//						string = "你输了！";
-//					}
-//					x = global.getDeviceWidth() / 2;
-//					y = global.getDeviceHeight() / 2;
-//					global.setYouLose(false);
-//					global.setYouWin(false);
-//				}
-//				else {
-//					string = "胜利条件：击中" + global.getTaskHitCount() + 
-//							" 已击中：" + global.getHitCount() + 
-//							" 失败条件：逃出" + global.getTaskEscapeCount() + 
-//							" 已逃出：" + global.getEscapeCount();
-//				}
-//				canvas.drawText(string, global.getDeviceWidth() / 2, global.getDeviceHeight() / 2, paint);
 			} catch (Exception e) {
 				// TODO: handle exception
 				Log.e("onDrawThread-->", "");
