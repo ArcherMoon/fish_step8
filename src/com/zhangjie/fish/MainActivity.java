@@ -2,12 +2,14 @@ package com.zhangjie.fish;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		TextView textView = (TextView)findViewById(R.id.text1);
 		
 		/* 创建surfaceView，创建绘图线程（并不启动）  */
 		MySurfaceView myView = new MySurfaceView(this);

@@ -163,7 +163,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
-		
+		Log.d("surfaceDestroyed--->", "");
 	}
 	
 	/* 更新图层,包括图片的增加和删除，关于图片属性（平移，旋转等），由每个线程单独控制 */
@@ -234,7 +234,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			for (PicProperty picProperty : picLayer.get(id)) {
 				canvas.drawBitmap(picProperty.getCurPic(), picProperty.getPicMatrix(), null);
 			}			
-		}			
+		}		
 	}
 
 	@Override

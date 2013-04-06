@@ -4,9 +4,11 @@ import android.util.Log;
 
 public class FishActThread extends Thread{
 	private Fish fish = null;
+	Global global = null;
 
 	public FishActThread(Fish fish) {
 		this.fish = fish;
+		global = Global.getInstance();
 	}
 
 	@Override
@@ -14,7 +16,9 @@ public class FishActThread extends Thread{
 		int index = 0;
 		while (GamingInfo.getGamingInfo().isGaming()) {
 			if (true == fish.isAlreadyHit ||
-				true == fish.isOutScene) {
+				true == fish.isOutScene ||
+				global.isYouLose() ||
+				global.isYouWin()) {
 				break;
 			}
 			fish.setCurPicIndex(index);

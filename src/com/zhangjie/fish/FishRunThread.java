@@ -15,6 +15,11 @@ public class FishRunThread extends Thread{
 	private int speed = 0;		/* 运动速度 */
 	private MoveCallBack moveCallBack = null;
 	private MySurfaceView myView = null;
+	Global global = null;			/* 指向保存全局变量的类 */
+	private int hitCount = 0;		/* 击中鱼的统计计数 */
+	private int escapeCount = 0;	/* 逃出鱼的统计计数 */
+	private int taskHitCount = 0;		/* 任务胜利击中数 */
+	private int taskEscapeCount = 0;	/* 任务失败逃出数 */
 	
 	public FishRunThread(Fish fish) {
 		super();
@@ -54,6 +59,9 @@ public class FishRunThread extends Thread{
 		this.speed = fish.getSpeed() / 50;
 		this.peer = peer;
 		this.myView = myView;
+		global = Global.getInstance();
+		taskHitCount = global.getTaskHitCount();
+		taskEscapeCount = global.getTaskEscapeCount();
 	}
 
 	/**
@@ -150,10 +158,13 @@ public class FishRunThread extends Thread{
 		}
 		
 		while (GamingInfo.getGamingInfo().isGaming()) {	
+			
 			/* 碰撞检测，如果被撞，删除图片，退出线程 */
 			if (fish.isAlreadyHit ||
 				fish.isHitBy(myView.bulletTmp) ||
-				fish.isOutScene()) {
+				fish.isOutScene() ||
+				global.isYouLose() ||
+				global.isYouWin()) {
 				try {
 					/* 子弹已经击中一条鱼了，不能再使用了 */
 					myView.bulletTmp = null;
@@ -164,21 +175,49 @@ public class FishRunThread extends Thread{
 					e.printStackTrace();
 				}
 				
+				if (global.isYouLose() || global.isYouWin()) {
+					break;
+				}
+				
 				/* 如果删除的是子弹则不需要新增加鱼 */
 				if (false == fish.isFish()) {
 					break;
 				}
 				
+				/* 逃出鱼的统计计数增加 */
+				if (fish.isOutScene()) {
+					escapeCount = global.getEscapeCount() + 1;
+					global.setEscapeCount(escapeCount);
+					Log.d("FishRunThread-->", "已逃出" + escapeCount);
+					if (escapeCount >= taskEscapeCount) {
+						global.setYouLose(true);
+						break;
+					}
+				}
+				/* 击中鱼的统计计数增加 */
+				else {
+					hitCount = global.getHitCount() + 1;
+					global.setHitCount(hitCount);
+					Log.d("FishRunThread-->", "已击中" + hitCount);
+					if (hitCount >= taskHitCount) {
+						global.setYouWin(true);
+						break;
+					}
+				}
+				
 				/* 删一个，加一个 */
 				Fish tmpFish = new Fish(50);
+				int i = (int)(Math.random() * 100) % 2 + 1;
 				try {
-					tmpFish.setActPics(myView.actPicsMap.get("fish"), myView.globalBitmap, "fish02");
+					tmpFish.setActPics(myView.actPicsMap.get("fish"), myView.globalBitmap, "fish0" + i);
 					myView.updatePicLayer(MySurfaceView.CHANGE_MODE_ADD, MySurfaceView.MIDDLE_LAYER, tmpFish);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				FishRunThread tmpFishThread = new FishRunThread(tmpFish, MySurfaceView.MOVE_STRAIGHT, myView.bulletTmp, myView);
+				FishRunThread tmpFishThread = new FishRunThread(tmpFish, i-1, myView.bulletTmp, myView);
 				tmpFishThread.start();
+				FishActThread tmpFishThread2 = new FishActThread(tmpFish);
+				tmpFishThread2.start();
 				break;
 			}
 			

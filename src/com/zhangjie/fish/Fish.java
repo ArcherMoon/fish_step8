@@ -16,9 +16,9 @@ import com.zhangjie.fish.parse.ParseParam;
 public class Fish extends PicProperty{
 	private ArrayList<Bitmap> acts = new ArrayList<Bitmap>();
 	private int index = 0;
-	private float toPosX = 0;	/* 到哪一点 */
+	private float toPosX = 0;			/* 到哪一点 */
 	private float toPosY = 0;
-	private int speed = 0;		/* 每秒钟移动速度 */
+	private int speed = 0;				/* 每秒钟移动速度 */
 	private boolean isFish = true;	/* 判断是鱼还是子弹 */
 	public boolean isOutScene = false;
 	private int deviceWidth = 0;
