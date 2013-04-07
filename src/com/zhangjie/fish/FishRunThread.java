@@ -38,16 +38,19 @@ public class FishRunThread extends Thread{
 	public FishRunThread(Fish fish, int movePath, Fish peer, MySurfaceView myView) {
 		super();
 		this.fish = fish;
+		global = Global.getInstance();
+		taskHitCount = global.getTaskHitCount();
+		taskEscapeCount = global.getTaskEscapeCount();
 		Log.d("FishRunThread", fish.getToPosX() + "");
 		/* 表明鱼的起始点，终点随机,待重构 */
 		if (-1 == fish.getToPosX()) {
 			int minY = 0;
-			int maxY = myView.DEVICE_HEIGHT - fish.getPicHeight();
+			int maxY = global.getDeviceHeight() - fish.getPicHeight();
 			int rangeY = maxY - minY;
 			/* 随机数的范围是 < 1的，所以要先乘1000000 */
 			curPosY = (int)(Math.random() * 1000000) % rangeY;
 			fish.setToPosY((int)(Math.random() * 1000000) % rangeY);
-			curPosX = myView.DEVICE_WIDTH;	
+			curPosX = global.getDeviceWidth();	
 			fish.setToPosX(0);
 		}
 		else {
@@ -59,9 +62,6 @@ public class FishRunThread extends Thread{
 		this.speed = fish.getSpeed() / 50;
 		this.peer = peer;
 		this.myView = myView;
-		global = Global.getInstance();
-		taskHitCount = global.getTaskHitCount();
-		taskEscapeCount = global.getTaskEscapeCount();
 	}
 
 	/**

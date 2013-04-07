@@ -39,8 +39,6 @@ public class Global extends Application{
 		// TODO Auto-generated method stub
 		super.onCreate();
 		instance = this;
-		deviceWidth = 480;
-		deviceHeight = 320;
 		taskHitCount = 3;
 		taskEscapeCount = 3;
 	}

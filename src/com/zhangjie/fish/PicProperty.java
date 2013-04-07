@@ -12,8 +12,8 @@ public class PicProperty {
 	private Bitmap bitmap = null;
 	private Matrix matrix = new Matrix();
 	/* Õº∆¨Àı∑≈±»¿˝ */
-	private float width_ratio = 480 / 800f;
-	private float height_ratio = 320 / 480f;
+	private float width_ratio = 1f;
+	private float height_ratio = 1f;
 	private int curPosX = 0;
 	private int curPosY = 0;
 	public boolean isAlreadyHit = false;
@@ -36,6 +36,9 @@ public class PicProperty {
 
 	public PicProperty() {
 		matrix.setTranslate(0, 0);
+		Global global = Global.getInstance();
+		width_ratio = global.getDeviceWidth() / 800f;
+		height_ratio = global.getDeviceHeight() / 480f;
 	}
 
 	/* …Ë÷√æÿ’Û */

@@ -25,8 +25,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 	private OnDrawThread myDrawThread;
 	public AssetManager assets = null;
-	public  int DEVICE_WIDTH = 480;
-	public  int DEVICE_HEIGHT = 320;
+	public  int deviceWidth = 0;
+	public  int deviceHeight = 0;
 	
 	/* 鱼运动的轨迹，直线，曲线，还是随机 */
 	public static final int MOVE_STRAIGHT = 0;
@@ -89,14 +89,19 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			int height) {
 		// TODO Auto-generated method stub
 		Log.d("surfaceChanged--->", "width = " + width + " height = " + height);
-//		DEVICE_WIDTH = width;
-//		DEVICE_HEIGHT = height;		
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO Auto-generated method stub	
-		Log.d("surfaceCreated--->", "chenggong");
+	
+		/* 取得设备的长宽 */
+		deviceWidth = this.getWidth();
+		deviceHeight = this.getHeight();
+		global.setDeviceWidth(deviceWidth);
+		global.setDeviceHeight(deviceHeight);
+		
+		Log.d("surfaceCreated--->", "成功 " + global.getDeviceWidth() + global.getDeviceHeight());
 		
 		/* 初始化图层（背景层，中间层，顶层） */
 		ArrayList<PicProperty> bottomPicList = new ArrayList<PicProperty>();
@@ -218,7 +223,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			touchPosY = (int)event.getY();
 			Log.d("onTouchEvent--->", "touchPosX" + touchPosX + "touchPosY" + touchPosY);
 			/* 由炮台的起始坐标，触摸点的坐标，计算斜率，从而得出运动路线 */
-			Fish bullet = new Fish(DEVICE_WIDTH / 2, DEVICE_HEIGHT, touchPosX, touchPosY, 320);
+			Fish bullet = new Fish(deviceWidth / 2, deviceHeight, touchPosX, touchPosY, 320);
 			try {
 				bullet.setActPics(actPicsMap.get("fish"), globalBitmap, "fish03");
 				updatePicLayer(CHANGE_MODE_ADD, MIDDLE_LAYER, bullet);
@@ -276,7 +281,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	
 		/* 加一条鱼到中间层 */
 		Fish fish = null;
-		fish = new Fish(DEVICE_WIDTH, 160, 0 ,0, 50);
+		fish = new Fish(deviceWidth, 160, 0 ,0, 50);
 		
 		/* 加第2条鱼到中间层 */
 		Fish fish2 = null;
