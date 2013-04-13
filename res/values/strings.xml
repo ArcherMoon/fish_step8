@@ -4,5 +4,7 @@
     <string name="app_name">fish</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
+    <string name="nextlevel">你赢了！开始下一关</string>
+    <string name="restart">你输了！重新开始本关</string>
 
 </resources>

@@ -14,6 +14,7 @@ public class PicProperty {
 	/* 图片缩放比例 */
 	private float width_ratio = 1f;
 	private float height_ratio = 1f;
+	private float ratio = 1f;	/* 最终缩放比例 */
 	private int curPosX = 0;
 	private int curPosY = 0;
 	public boolean isAlreadyHit = false;
@@ -39,6 +40,12 @@ public class PicProperty {
 		Global global = Global.getInstance();
 		width_ratio = global.getDeviceWidth() / 800f;
 		height_ratio = global.getDeviceHeight() / 480f;
+		if (width_ratio > height_ratio) {
+			ratio = width_ratio;
+		}
+		else {
+			ratio = height_ratio;
+		}
 	}
 
 	/* 设置矩阵 */
@@ -61,16 +68,12 @@ public class PicProperty {
 		
 		/* 从输入流解析位图 */
 		bitmap = BitmapFactory.decodeStream(is);
-		bitmap = Bitmap.createScaledBitmap(bitmap, (int) (getPicWidth()*height_ratio), (int) (getPicHeight()*height_ratio), true);		
+		bitmap = Bitmap.createScaledBitmap(bitmap, (int) (getPicWidth()*ratio), (int) (getPicHeight()*ratio), true);		
 		return;
 	}
 
-	public float getWidth_ratio() {
-		return width_ratio;
-	}
-
-	public float getHeight_ratio() {
-		return height_ratio;
+	public float getRatio() {
+		return ratio;
 	}
 
 	/* 获取当前图片 */

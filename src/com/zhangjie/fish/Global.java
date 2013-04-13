@@ -78,5 +78,4 @@ public class Global extends Application{
 	public int getTaskEscapeCount() {
 		return taskEscapeCount;
 	}
-	
 }

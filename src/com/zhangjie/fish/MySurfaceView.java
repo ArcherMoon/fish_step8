@@ -12,15 +12,20 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.os.Handler;
+import android.os.Message;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
 
 import com.zhangjie.fish.parse.ParseParam;
 import com.zhangjie.fish.parse.PicParser;
 
-@SuppressLint({ "DrawAllocation", "UseSparseArrays" })
+@SuppressLint({ "DrawAllocation", "UseSparseArrays", "HandlerLeak" })
 public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback{
 
 	private OnDrawThread myDrawThread;
@@ -62,12 +67,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	
 	private Global global = null;
 	private PicProperty bg = null;
-	public int scene = 0;
+	public int scene = 0;		/* 当前处于第几关 */
 	
-	public MySurfaceView(Context context) {
+	private Button buttonNext = null;
+	private Button buttonRestart = null;
+
+	public MySurfaceView(Context context, AttributeSet attrs) {
 		super(context);
 		// TODO Auto-generated constructor stub
-		Log.d("MySurfaceView--->", "chenggong");
 		
 		/* 获取全局变量 */
 		global = Global.getInstance();
@@ -80,8 +87,26 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		 */
 		SurfaceHolder surfaceHolder = getHolder();
 		surfaceHolder.addCallback(this);
+		
+		/* 创建handler，重写收消息方法,暂不可用 */
+		Handler handler = new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				String string = msg.getData().getString("RESULT");
+				if (string.equals("YOU_WIN")) {
+					buttonNext.setVisibility(View.VISIBLE);
+					Log.d("buttonNext--->", buttonNext.getText() + "");
+				}
+				else if (string.equals("YOU_LOSE")) {
+					buttonRestart.setVisibility(View.VISIBLE);
+				}
+				super.handleMessage(msg);
+			}
+		};
+		
 		/* 创建绘图线程 */
 		myDrawThread = new OnDrawThread(this);
+		Log.d("MySurfaceView--->", "成功");
 	}
 
 	@Override
@@ -281,7 +306,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	
 		/* 加一条鱼到中间层 */
 		Fish fish = null;
-		fish = new Fish(deviceWidth, 160, 0 ,0, 50);
+		fish = new Fish(50);
 		
 		/* 加第2条鱼到中间层 */
 		Fish fish2 = null;
@@ -312,4 +337,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		fishActThread2.start();
 		return;		
 	}
+
+	public void setButtonNext(Button buttonNext) {
+		this.buttonNext = buttonNext;
+	}
+
+	public void setButtonRestart(Button buttonRestart) {
+		this.buttonRestart = buttonRestart;
+	}
+	
 }

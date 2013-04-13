@@ -155,7 +155,7 @@ public class Fish extends PicProperty{
 		for (ParseParam parseParam : arrayList) {
 			int width = parseParam.getWidth();
 			int height = parseParam.getHeight();
-			scaleMatrix.setScale(getHeight_ratio(), getHeight_ratio());
+			scaleMatrix.setScale(getRatio(), getRatio());
 			tmpBitmap = Bitmap.createBitmap(pic, 
 					parseParam.getX(), 
 					parseParam.getY(), 

@@ -2,7 +2,10 @@ package com.zhangjie.fish;
 
 import java.io.IOException;
 
+import android.R.bool;
+import android.R.xml;
 import android.graphics.Matrix;
+import android.os.IInterface;
 import android.util.Log;
 
 public class FishRunThread extends Thread{
@@ -77,7 +80,33 @@ public class FishRunThread extends Thread{
 	 *  沿曲线运动，目前是正弦线,实现接口中的move方法，作为回调
 	 */
 	class MoveAlongCurve implements MoveCallBack
-	{
+	{	
+		/* 随机运动的正弦线 y= a - b*sin(c*x + d) */
+		private float a = 0;
+		private float b = 1;
+		private float c = 1;
+		private float d = 0;
+
+		public MoveAlongCurve() {
+			/* 生成随机数 */
+			int random = (int)(Math.random() * 1000000);
+			/* a定为屏幕高度的1/3 ~ 2/3,注意考虑在波谷时鱼的高度，不要越界 */
+			int h1 = myView.deviceHeight / 3;
+			a = h1 + random % (h1 - fish.getPicHeight());
+			
+			/* 振幅b定为屏幕高度的1/6 ~ 1/3 */
+			int h2 = myView.deviceHeight / 6;
+			b = h2 + random % h2;
+			
+			/* c的取值使正弦在屏幕宽度的1/4 ~ 1/2达到最大 */
+			int w1 = myView.deviceWidth / 4;
+			int temp = w1 + random % w1;
+			c = 1.57f / temp;
+			
+			/* d的取值为0 ~ 3.14 */
+			d = random % 3;
+		}
+
 		@Override
 		public void move() {
 			tmpMatrix = fish.getPicMatrix();
@@ -88,7 +117,7 @@ public class FishRunThread extends Thread{
 			 * 线在屏幕高度的一半开始，要变为y=160 - 80*sin(0.0131x)
 			 * 注：以屏幕480*320为例
 			 */
-			curPosY = 160 - (float)(Math.sin(0.0131 * curPosX)*80);
+			curPosY = a - (float)(b * Math.sin(c * curPosX + d));
 			/* 先将原有矩阵清除，再做平移 */
 			tmpMatrix.setTranslate(curPosX, curPosY);
 			fish.setCurPosX((int)curPosX);
@@ -99,7 +128,7 @@ public class FishRunThread extends Thread{
 			 * 由斜率可以求得倾斜角度 tanθ= y',θ= arctan(y')=-cos(0.0131x)*80*0.0131
 			 */
 			/* 在平移的基础上做旋转 */
-			tmpMatrix.postRotate(-(float)Math.toDegrees(Math.atan(Math.cos(0.0131 * curPosX)*80*0.0131)), curPosX, curPosY);
+			tmpMatrix.postRotate(-(float)Math.toDegrees(Math.atan(Math.cos(c * curPosX + d)*b*c)), curPosX, curPosY);
 			curPosX--;		
 		}	
 	}
@@ -114,7 +143,7 @@ public class FishRunThread extends Thread{
 		private float extraDegree = 0;		/* 斜率为负时，旋转角需再加180度 */
 		
 		public MoveAlongStraight() {
-			Log.d("MoveAlongStraight--->", "curPosY  " + curPosY + "  fish.getToPosY()  " + fish.getToPosY());
+			Log.d("MoveAlongStraight--->", "curPosY = " + curPosY + "， fish.getToPosY()  " + fish.getToPosY());
 			/* 计算斜率，截距 */
 			a = (fish.getToPosY() - curPosY) / (fish.getToPosX() - curPosX);
 			b = fish.getToPosY() - a * fish.getToPosX();
@@ -123,9 +152,9 @@ public class FishRunThread extends Thread{
 				extraDegree = 180;
 			}
 		}
+		
 
-		@Override
-		public void move() {
+		public void move_stub() {
 			tmpMatrix = fish.getPicMatrix();
 			curPosY = a * curPosX + b;
 			tmpMatrix.setTranslate(curPosX, curPosY);
@@ -138,6 +167,32 @@ public class FishRunThread extends Thread{
 			else {
 				curPosX -= speed;
 			}		
+		}
+		
+		@Override
+		public void move() {
+			tmpMatrix = fish.getPicMatrix();
+			if (Math.abs(a) <= 1) {
+				curPosY = a * curPosX + b;
+			}
+			else {
+				curPosX = (curPosY - b) / a;
+			}
+			tmpMatrix.setTranslate(curPosX, curPosY);
+			tmpMatrix.postRotate((float)Math.toDegrees(Math.atan(a)) + extraDegree, curPosX, curPosY);
+			fish.setCurPosX((int)curPosX);
+			fish.setCurPosY((int)curPosY);
+			if (Math.abs(a) <= 1) {
+				if (a < 0) {
+					curPosX += speed;	
+				} 
+				else {
+					curPosX -= speed;
+				}	
+			}
+			else {
+				curPosY -= speed;	
+			}
 		}
 	}
 	
