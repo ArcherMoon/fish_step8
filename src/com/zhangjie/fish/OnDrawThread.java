@@ -32,7 +32,7 @@ public class OnDrawThread extends Thread{
 		/* 设置画笔 */
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
-		int textSize = myView.deviceHeight / 16;
+		int textSize = (int)(myView.deviceHeight / 16f);
 		paint.setTextSize(textSize);
 		paint.setAntiAlias(true);	/* 设置抗锯齿 */
 		Typeface font = Typeface.create("宋体", Typeface.BOLD);
@@ -67,7 +67,11 @@ public class OnDrawThread extends Thread{
 
 					canvas.drawText("你赢了!", global.getDeviceWidth() / 2, global.getDeviceHeight() / 2, paint);
 	
-					++myView.scene;
+					/* 所有场景装载完且胜利说明通关了 */
+					if (++myView.scene > 2) {
+						global.setYouWin(false);
+						continue;
+					}
 					myView.loadScene("images/bg/fishlightbg_" + myView.scene + ".jpg");
 				}
 				else if (global.isYouLose()) {
@@ -85,6 +89,9 @@ public class OnDrawThread extends Thread{
 									"\n失败条件：逃出" + global.getTaskEscapeCount() + 
 									"\n已逃出：" + global.getEscapeCount(), 
 									textSize / 2, textSize, paint);
+					if (myView.scene > 2) {
+						canvas.drawText("恭喜通关!", global.getDeviceWidth() / 2, global.getDeviceHeight() / 2, paint);
+					}
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
