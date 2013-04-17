@@ -85,10 +85,11 @@ public class OnDrawThread extends Thread{
 				}
 				else {
 					canvas.drawText("胜利条件：击中" + global.getTaskHitCount() + 
-									"\n已击中：" + global.getHitCount() + 
-									"\n失败条件：逃出" + global.getTaskEscapeCount() + 
-									"\n已逃出：" + global.getEscapeCount(), 
+									",已击中：" + global.getHitCount(), 
 									textSize / 2, textSize, paint);
+					canvas.drawText("失败条件：逃出" + global.getTaskEscapeCount() + 
+									",已逃出：" + global.getEscapeCount(), 
+									textSize / 2, textSize * 2, paint);
 					if (myView.scene > 2) {
 						canvas.drawText("恭喜通关!", global.getDeviceWidth() / 2, global.getDeviceHeight() / 2, paint);
 					}

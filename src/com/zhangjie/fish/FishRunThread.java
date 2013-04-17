@@ -141,32 +141,20 @@ public class FishRunThread extends Thread{
 		private float a = 0;
 		private float b = 0;
 		private float extraDegree = 0;		/* 斜率为负时，旋转角需再加180度 */
+		private float startPosX = 0;	/* 起始点坐标 */
+		private float startPosY = 0;
 		
 		public MoveAlongStraight() {
 			Log.d("MoveAlongStraight--->", "curPosY = " + curPosY + "， fish.getToPosY()  " + fish.getToPosY());
+			startPosX = curPosX;
+			startPosY = curPosY;
 			/* 计算斜率，截距 */
 			a = (fish.getToPosY() - curPosY) / (fish.getToPosX() - curPosX);
 			b = fish.getToPosY() - a * fish.getToPosX();
 			Log.d("MoveAlongStraight--->", "a=  " + a + "  b =  " + b);
-			if (a < 0 && (true != fish.isFish())) {
+			if (fish.getToPosX() > startPosX) {
 				extraDegree = 180;
 			}
-		}
-		
-
-		public void move_stub() {
-			tmpMatrix = fish.getPicMatrix();
-			curPosY = a * curPosX + b;
-			tmpMatrix.setTranslate(curPosX, curPosY);
-			tmpMatrix.postRotate((float)Math.toDegrees(Math.atan(a)) + extraDegree, curPosX, curPosY);
-			fish.setCurPosX((int)curPosX);
-			fish.setCurPosY((int)curPosY);
-			if (a < 0 && (true != fish.isFish())) {
-				curPosX += speed;	
-			} 
-			else {
-				curPosX -= speed;
-			}		
 		}
 		
 		@Override
@@ -183,7 +171,7 @@ public class FishRunThread extends Thread{
 			fish.setCurPosX((int)curPosX);
 			fish.setCurPosY((int)curPosY);
 			if (Math.abs(a) <= 1) {
-				if (a < 0) {
+				if (fish.getToPosX() > startPosX) {
 					curPosX += speed;	
 				} 
 				else {
@@ -191,7 +179,12 @@ public class FishRunThread extends Thread{
 				}	
 			}
 			else {
-				curPosY -= speed;	
+				if (fish.getToPosY() > startPosY) {
+					curPosY += speed;	
+				} 
+				else {
+					curPosY -= speed;
+				}	
 			}
 		}
 	}
@@ -230,6 +223,7 @@ public class FishRunThread extends Thread{
 					e.printStackTrace();
 				}
 				
+				/* 如果赢或输了，所有运动和动作线程都要退出 */
 				if (global.isYouLose() || global.isYouWin()) {
 					break;
 				}
@@ -243,7 +237,7 @@ public class FishRunThread extends Thread{
 				if (fish.isOutScene()) {
 					escapeCount = global.getEscapeCount() + 1;
 					global.setEscapeCount(escapeCount);
-					Log.d("FishRunThread-->", "已逃出" + escapeCount);
+					Log.d("FishRunThread-->已逃出", "已逃出" + escapeCount + "," + global.getDeviceWidth());
 					if (escapeCount >= taskEscapeCount) {
 						global.setYouLose(true);
 						break;

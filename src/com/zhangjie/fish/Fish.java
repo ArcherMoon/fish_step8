@@ -114,7 +114,7 @@ public class Fish extends PicProperty{
 			(y < -w) ||
 			(y > deviceHeight + w)) {
 			isOutScene = true;
-			Log.d("isOutScene--->", "deviceWidth = " + deviceWidth +", deviceHeight = "+ deviceHeight);
+			Log.d("isOutScene--->", "x = " + x +", y = "+ y);
 		}
 		return isOutScene;
 	}
